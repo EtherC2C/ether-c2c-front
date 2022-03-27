@@ -1,3 +1,20 @@
+const networks = new Map([
+  [
+    "0x1",
+    {
+      rpcUrls: ["https://mainnet.infura.io/v3/"],
+      chainName: "Ethereum Mainnet",
+    },
+  ],
+  [
+    "0x4",
+    {
+      rpcUrls: ["https://rinkeby.infura.io/v3/"],
+      chainName: "Rinkeby Testnet",
+    },
+  ],
+]);
+
 Web3Modal = window.Web3Modal.default;
 
 WalletConnectProvider = window.WalletConnectProvider.default;
@@ -44,19 +61,20 @@ async function initWeb3() {
     flush();
   });
 }
+
 async function flush() {
   web3 = new Web3(provider);
   ens = new ethers.providers.Web3Provider(web3.currentProvider);
   chainId = await web3.eth.getChainId();
   console.log("chainId:" + chainId);
   if (chainId == 1) {
-    $(".network-a").attr("class","btn btn-icon-split network-a btn-info")
+    $(".network-a").attr("class", "btn btn-icon-split network-a btn-info");
     $(".network").html("Ethereum Mainnet");
   } else if (chainId == 4) {
-    $(".network-a").attr("class","btn btn-icon-split network-a btn-warning")
+    $(".network-a").attr("class", "btn btn-icon-split network-a btn-warning");
     $(".network").html("Rinkeby Testnet");
-  }else{
-    $(".network-a").attr("class","btn btn-icon-split network-a btn-danger")
+  } else {
+    $(".network-a").attr("class", "btn btn-icon-split network-a btn-danger");
     $(".network").html("Invalid Network");
   }
   const accounts = await web3.eth.getAccounts();
@@ -74,5 +92,36 @@ async function getEnsName(account) {
     return ensName;
   } catch (e) {
     return account;
+  }
+}
+
+async function changeNetwork(chainId) {
+  chainId = web3.utils.toHex(chainId);
+  try {
+    await ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: chainId }],
+    });
+  } catch (switchError) {
+    // This error code indicates that the chain has not been added to MetaMask.
+    if (switchError.code === 4902) {
+      chain = networks.get(chainId);
+      try {
+        await ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [
+            {
+              chainId: chainId,
+              chainName: chain.chainName,
+              rpcUrls: chain.rpcUrls /* ... */,
+            },
+          ],
+        });
+        flush();
+      } catch (addError) {
+        // handle "add" error
+      }
+    }
+    // handle other "switch" errors
   }
 }

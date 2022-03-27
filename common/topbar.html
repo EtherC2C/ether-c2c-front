@@ -59,8 +59,8 @@
       >
         <i class="fas fa-search fa-fw"></i>
       </a> -->
-      <!-- Dropdown - Messages -->
-      <!-- <div
+    <!-- Dropdown - Messages -->
+    <!-- <div
         class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
         aria-labelledby="searchDropdown"
       >
@@ -95,11 +95,11 @@
         aria-expanded="false"
       >
         <i class="fas fa-bell fa-fw"></i> -->
-        <!-- Counter - Alerts -->
-        <!-- <span class="badge badge-danger badge-counter">3+</span>
+    <!-- Counter - Alerts -->
+    <!-- <span class="badge badge-danger badge-counter">3+</span>
       </a> -->
-      <!-- Dropdown - Alerts -->
-      <!-- <div
+    <!-- Dropdown - Alerts -->
+    <!-- <div
         class="
           dropdown-list dropdown-menu dropdown-menu-right
           shadow
@@ -162,11 +162,11 @@
         aria-expanded="false"
       >
         <i class="fas fa-envelope fa-fw"></i> -->
-        <!-- Counter - Messages -->
-        <!-- <span class="badge badge-danger badge-counter">7</span>
+    <!-- Counter - Messages -->
+    <!-- <span class="badge badge-danger badge-counter">7</span>
       </a> -->
-      <!-- Dropdown - Messages -->
-      <!-- <div
+    <!-- Dropdown - Messages -->
+    <!-- <div
         class="
           dropdown-list dropdown-menu dropdown-menu-right
           shadow
@@ -252,7 +252,7 @@
       <div
         class="nav-link dropdown-toggle"
         href="#"
-        id="userDropdown"
+        id="networkDropdown"
         role="button"
         data-toggle="dropdown"
         aria-haspopup="true"
@@ -260,6 +260,17 @@
       >
         <a href="#" class="btn btn-danger btn-icon-split network-a">
           <span class="text network text-white-600 small">Invalid Network</span>
+        </a>
+      </div>
+      <div
+        class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+        aria-labelledby="networkDropdown"
+      >
+        <a class="dropdown-item" href="#" onclick="changeNetwork(1)">
+          <span class="text text-white-600 small">Ethereum Mainnet</span>
+        </a>
+        <a class="dropdown-item" href="#" onclick="changeNetwork(4)">
+          <span class="text text-white-600 small">Rinkeby Testnet</span>
         </a>
       </div>
     </li>
@@ -277,9 +288,9 @@
         aria-haspopup="true"
         aria-expanded="false"
       >
-        <span class="mr-2 d-none d-lg-inline text-gray-600 small account"
-          ></span
-        >
+        <span
+          class="mr-2 d-none d-lg-inline text-gray-600 small account"
+        ></span>
         <img class="img-profile rounded-circle" src="img/undraw_profile.svg" />
       </a>
       <!-- Dropdown - User Information -->
