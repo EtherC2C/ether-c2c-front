@@ -150,6 +150,13 @@ const networks = new Map([
   ],
 ]);
 
+const orderTypes = new Map([
+  [1, "sellETH"],
+  [2, "sellToken"],
+  [3, "buyETH"],
+  [4, "buyToken"],
+]);
+
 Web3Modal = window.Web3Modal.default;
 
 WalletConnectProvider = window.WalletConnectProvider.default;
@@ -161,6 +168,8 @@ let ens;
 let selectedAccount;
 
 let etherC2C;
+
+let emitter;
 
 async function initWeb3() {
   const providerOptions = {
@@ -228,7 +237,10 @@ async function flush() {
 }
 
 async function loadOrders() {
-  etherC2C.events
+  if (emitter) {
+    emitter.removeAllListeners("data");
+  }
+  emitter = etherC2C.events
     .CreateOrder(
       {
         fromBlock: 0,
@@ -263,11 +275,25 @@ async function loadOrders() {
             amount.toFixed(18) +
             " " +
             uint +
-            " </br>" +
-            info +
+            ' <div type="button" class="btn btn-success" data-toggle="modal" data-target=".detailModal" data-whatever="' +
+            id +
+            '">Detail</div></br>' +
             " </div>"
         );
         $(".buy-body").append(content);
+        $(".detailModal").on("show.bs.modal", async function (event) {
+          var button = $(event.relatedTarget); // Button that triggered the modal
+          var recipient = button.data("whatever"); // Extract info from data-* attributes
+          // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+          // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+          var modal = $(this);
+          let order = await etherC2C.methods.orders(recipient).call();
+          console.log(order);
+          modal.find(".orderType").html(orderTypes.get(order["oType"]));
+          modal.find(".orderAmount").html((order["amount"] / 10 ** 18).toFixed(18));
+          modal.find(".orderInfo").html(order["info"]);
+          modal.find(".orderOwner").html(order["owner"]);
+        });
       }
     });
 }
