@@ -151,10 +151,10 @@ const networks = new Map([
 ]);
 
 const orderTypes = new Map([
-  [1, "sellETH"],
-  [2, "sellToken"],
-  [3, "buyETH"],
-  [4, "buyToken"],
+  ["1", "sellETH"],
+  ["2", "sellToken"],
+  ["3", "buyETH"],
+  ["4", "buyToken"],
 ]);
 
 Web3Modal = window.Web3Modal.default;
@@ -280,7 +280,15 @@ async function loadOrders() {
             '">Detail</div></br>' +
             " </div>"
         );
-        $(".buy-body").append(content);
+        console.log(oType);
+        if (oType == 1) {
+          content.find(".btn").attr("class","btn btn-primary")
+          $(".sell-body").append(content);
+        } else if (oType == 3) {
+          content.find(".btn").attr("class","btn btn-success")
+          $(".buy-body").append(content);
+        }
+
         $(".detailModal").on("show.bs.modal", async function (event) {
           var button = $(event.relatedTarget); // Button that triggered the modal
           var recipient = button.data("whatever"); // Extract info from data-* attributes
@@ -289,8 +297,11 @@ async function loadOrders() {
           var modal = $(this);
           let order = await etherC2C.methods.orders(recipient).call();
           console.log(order);
+          console.log(orderTypes.get(order["oType"]));
           modal.find(".orderType").html(orderTypes.get(order["oType"]));
-          modal.find(".orderAmount").html((order["amount"] / 10 ** 18).toFixed(18));
+          modal
+            .find(".orderAmount")
+            .html((order["amount"] / 10 ** 18).toFixed(18));
           modal.find(".orderInfo").html(order["info"]);
           modal.find(".orderOwner").html(order["owner"]);
         });
@@ -300,7 +311,7 @@ async function loadOrders() {
 
 async function createOrder() {
   etherC2C.methods
-    .createOrder(1, "hello", 3, selectedAccount)
+    .createOrder(1, "hello", 1, selectedAccount)
     .send({ from: selectedAccount });
 }
 
