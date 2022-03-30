@@ -1,46 +1,29 @@
 const etherC2CABI = [
   {
-    anonymous: false,
     inputs: [
       {
-        indexed: false,
         internalType: "uint256",
-        name: "id",
+        name: "_id",
         type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "oType",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "info",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "token",
-        type: "address",
       },
     ],
-    name: "CreateOrder",
-    type: "event",
+    name: "closeOrder",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_id",
+        type: "uint256",
+      },
+    ],
+    name: "confirmOrder",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [
@@ -66,6 +49,145 @@ const etherC2CABI = [
       },
     ],
     name: "createOrder",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "id",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "oType",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "info",
+        type: "string",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "token",
+        type: "address",
+      },
+    ],
+    name: "CreateOrder",
+    type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_id",
+        type: "uint256",
+      },
+    ],
+    name: "depositETH",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_id",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_amount",
+        type: "uint256",
+      },
+    ],
+    name: "depositToken",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_id",
+        type: "uint256",
+      },
+    ],
+    name: "judgment",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "previousOwner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "OwnershipTransferred",
+    type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_id",
+        type: "uint256",
+      },
+    ],
+    name: "pay",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "renounceOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "transferOwnership",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -110,26 +232,31 @@ const etherC2CABI = [
         name: "status",
         type: "uint256",
       },
+      {
+        internalType: "address",
+        name: "buyer",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "seller",
+        type: "address",
+      },
     ],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [
+    inputs: [],
+    name: "owner",
+    outputs: [
       {
-        internalType: "uint256",
-        name: "_id",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_status",
-        type: "uint256",
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
-    name: "setStatus",
-    outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "view",
     type: "function",
   },
 ];
@@ -155,6 +282,13 @@ const orderTypes = new Map([
   ["2", "sellToken"],
   ["3", "buyETH"],
   ["4", "buyToken"],
+]);
+
+const orderStatues = new Map([
+  ["1", "active"],
+  ["2", "deposited"],
+  ["3", "paid"],
+  ["4", "inactive"],
 ]);
 
 Web3Modal = window.Web3Modal.default;
@@ -221,7 +355,7 @@ async function flush() {
     $(".network").html("Rinkeby Testnet");
     etherC2C = new web3.eth.Contract(
       etherC2CABI,
-      "0xe6d86a8a2e0f54B902Ac38aA9064F2D664513790"
+      "0x4Ccc01d6bD56BA788a98cbD258a290a11101B1bc"
     );
   } else {
     $(".network-a").attr("class", "btn btn-icon-split network-a btn-danger");
@@ -280,12 +414,11 @@ async function loadOrders() {
             '">Detail</div></br>' +
             " </div>"
         );
-        console.log(oType);
         if (oType == 1) {
-          content.find(".btn").attr("class","btn btn-primary")
+          content.find(".btn").attr("class", "btn btn-primary");
           $(".sell-body").append(content);
         } else if (oType == 3) {
-          content.find(".btn").attr("class","btn btn-success")
+          content.find(".btn").attr("class", "btn btn-success");
           $(".buy-body").append(content);
         }
 
@@ -304,6 +437,7 @@ async function loadOrders() {
             .html((order["amount"] / 10 ** 18).toFixed(18));
           modal.find(".orderInfo").html(order["info"]);
           modal.find(".orderOwner").html(order["owner"]);
+          modal.find(".orderStatus").html(orderStatues.get(order["status"]));
         });
       }
     });
