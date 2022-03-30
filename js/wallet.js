@@ -463,7 +463,7 @@ async function loadOrders() {
             modal
               .find(".modal-footer")
               .append(
-                '<button type="button" class="btn btn-success" onclick="pay(' +
+                '<button type="button" class="btn btn-success" onclick="confirm(' +
                   id +
                   ')">Confirm</button>'
               );
@@ -482,7 +482,7 @@ async function pay(id) {
 }
 
 async function confirm(id) {
-  etherC2C.methods.confirm(id).send({ from: selectedAccount });
+  etherC2C.methods.confirmOrder(id).send({ from: selectedAccount });
 }
 
 async function createOrder() {
