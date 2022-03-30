@@ -104,37 +104,6 @@ const etherC2CABI = [
         type: "uint256",
       },
     ],
-    name: "depositETH",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_id",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_amount",
-        type: "uint256",
-      },
-    ],
-    name: "depositToken",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_id",
-        type: "uint256",
-      },
-    ],
     name: "judgment",
     outputs: [],
     stateMutability: "nonpayable",
@@ -175,6 +144,37 @@ const etherC2CABI = [
   {
     inputs: [],
     name: "renounceOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_id",
+        type: "uint256",
+      },
+    ],
+    name: "stakeETH",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_id",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_amount",
+        type: "uint256",
+      },
+    ],
+    name: "stakeToken",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -355,7 +355,7 @@ async function flush() {
     $(".network").html("Rinkeby Testnet");
     etherC2C = new web3.eth.Contract(
       etherC2CABI,
-      "0x4Ccc01d6bD56BA788a98cbD258a290a11101B1bc"
+      "0x5bD137400bfB997c123a05b0153400559FE994ed"
     );
   } else {
     $(".network-a").attr("class", "btn btn-icon-split network-a btn-danger");
@@ -424,11 +424,11 @@ async function loadOrders() {
 
         $(".detailModal").on("show.bs.modal", async function (event) {
           var button = $(event.relatedTarget); // Button that triggered the modal
-          var recipient = button.data("whatever"); // Extract info from data-* attributes
+          var id = button.data("whatever"); // Extract info from data-* attributes
           // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
           // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
           var modal = $(this);
-          let order = await etherC2C.methods.orders(recipient).call();
+          let order = await etherC2C.methods.orders(id).call();
           console.log(order);
           console.log(orderTypes.get(order["oType"]));
           modal.find(".orderType").html(orderTypes.get(order["oType"]));
@@ -438,9 +438,51 @@ async function loadOrders() {
           modal.find(".orderInfo").html(order["info"]);
           modal.find(".orderOwner").html(order["owner"]);
           modal.find(".orderStatus").html(orderStatues.get(order["status"]));
+          modal.find(".modal-footer").html("");
+          if (order["status"] == 1) {
+            modal
+              .find(".modal-footer")
+              .append(
+                '<button type="button" class="btn btn-primary" onclick="stake(' +
+                  id +
+                  "," +
+                  order["amount"] +
+                  ')">Stake ETH</button>'
+              );
+          }
+          if (order["status"] == 2) {
+            modal
+              .find(".modal-footer")
+              .append(
+                '<button type="button" class="btn btn-warning" onclick="pay(' +
+                  id +
+                  ')">Pay</button>'
+              );
+          }
+          if (order["status"] == 3) {
+            modal
+              .find(".modal-footer")
+              .append(
+                '<button type="button" class="btn btn-success" onclick="pay(' +
+                  id +
+                  ')">Confirm</button>'
+              );
+          }
         });
       }
     });
+}
+
+async function stake(id, amount) {
+  etherC2C.methods.stakeETH(id).send({ from: selectedAccount, value: amount });
+}
+
+async function pay(id) {
+  etherC2C.methods.pay(id).send({ from: selectedAccount });
+}
+
+async function confirm(id) {
+  etherC2C.methods.confirm(id).send({ from: selectedAccount });
 }
 
 async function createOrder() {
