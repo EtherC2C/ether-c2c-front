@@ -473,6 +473,10 @@ async function loadOrders() {
     });
 }
 
+async function createOrder(){
+  etherC2C.methods.createOrder().send({from:selectedAccount})
+}
+
 async function stake(id, amount) {
   etherC2C.methods.stakeETH(id).send({ from: selectedAccount, value: amount });
 }
